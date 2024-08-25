@@ -39,7 +39,9 @@ jobs:
         npm install || (echo "Initial install failed, retrying..." && npm cache clean --force && npm install)
 
     - name: Run Lint
-      run: npm run lint
+      run: |
+        npm install eslint --save-dev
+        npm run lint
 
     - name: Run Tests
       run: npm test
