@@ -34,8 +34,9 @@ jobs:
         echo "List of files:"
         ls -la
 
-    - name: Install Dependencies
-      run: npm install
+    - name: Install Dependencies (Safe Fallback)
+      run: |
+        npm install || (echo "Initial install failed, retrying..." && npm cache clean --force && npm install)
 
     - name: Run Lint
       run: npm run lint
