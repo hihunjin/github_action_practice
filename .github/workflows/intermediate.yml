@@ -39,12 +39,5 @@ jobs:
         pip install pytest
         pytest
 
-    - name: Build and check package (optional)
-      run: |
-        pip install build
-        python -m build
-        pip install twine
-        python -m twine check dist/*
-
     env:
       PYTHONUNBUFFERED: 1
