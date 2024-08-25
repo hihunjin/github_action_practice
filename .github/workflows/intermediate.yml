@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Python Application CI
 
 on:
   push:
@@ -8,51 +8,38 @@ on:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]  # macos-latest
-        node-version: [12.x, 14.x, 16.x]
-    runs-on: ${{ matrix.os }}
+        python-version: [3.7, 3.8, 3.9, 3.10]
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
       with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+        python-version: ${{ matrix.python-version }}
 
-    - name: Clear npm cache
-      run: npm cache clean --force
-
-    - name: Check current directory and list files
+    - name: Install dependencies
       run: |
-        echo "Working directory:"
-        pwd
-        echo "List of files:"
-        ls -la
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-    - name: Install Dependencies
+    - name: Lint with Flake8
       run: |
-        npm cache clean --force
-        npm install
-
-    - name: Run Lint
-      run: npm run lint
+        pip install flake8
+        flake8 .
 
     - name: Run Tests
-      run: npm test
+      run: |
+        pip install pytest
+        pytest
 
-    - name: Build
-      run: npm run build
-
-    - name: Archive Production Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: webpack-artifacts
-        path: dist/
-
-    env:
-      CI: true
+    - name: Build and check package (optional)
+      run: |
+        pip install build
+        python -m build
+        pip install twine
+        python -m twine check dist/*
