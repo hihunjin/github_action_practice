@@ -1,4 +1,4 @@
-name: Python Application CI
+name: Python Multi-OS CI
 
 on:
   push:
@@ -8,9 +8,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [3.7, 3.8, 3.9, 3.10]
 
     steps:
@@ -32,7 +34,7 @@ jobs:
         pip install flake8
         flake8 .
 
-    - name: Run Tests
+    - name: Run tests
       run: |
         pip install pytest
         pytest
@@ -43,3 +45,6 @@ jobs:
         python -m build
         pip install twine
         python -m twine check dist/*
+
+    env:
+      PYTHONUNBUFFERED: 1
